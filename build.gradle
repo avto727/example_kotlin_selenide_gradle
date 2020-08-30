@@ -1,0 +1,38 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0'
+  }
+}
+
+apply plugin: "kotlin"
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testCompile 'org.jetbrains.kotlin:kotlin-stdlib:1.4.0'
+  testCompile 'org.junit.jupiter:junit-jupiter:5.6.2'
+  testCompile 'com.codeborne:selenide:5.14.0'
+  testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.30'
+}
+
+task libs(type: Sync) {
+  from configurations.compile
+  from configurations.testCompile
+  into "$buildDir/lib"
+}
+
+compileKotlin.dependsOn libs
+
+test {
+  useJUnitPlatform()
+  systemProperties = [
+    'file.encoding'    : 'UTF-8',
+    'selenide.headless': 'true',
+    'BUILD_URL'        : System.getenv()['BUILD_URL'],
+  ]
+}
